@@ -1,4 +1,4 @@
-name: Update Repository
+name: Update Repository2
 run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on: workflow_dispatch
 permissions: write-all
