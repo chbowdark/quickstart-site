@@ -6,11 +6,6 @@ import { client } from "@/sanity/client";
 import Link from "next/link";
 import Image from "next/image";
 import ArticleReader from "@/components/ArticleReader";
-// import Refractor from 'react-refractor'
-// import js from 'refractor/lang/javascript'
-
-// Refractor.registerLanguage(js)
-
 
 const POST_QUERY = `*[_type == "post" && slug.current == $slug][0]`;
 
@@ -21,6 +16,27 @@ const urlFor = (source) =>
     : null;
 
 const sanityOptions = { next: { revalidate: 30 } };
+
+export const generateMetadata = async ({params, searchParams}, parent) => {
+
+  const post = await client.fetch(POST_QUERY, await params, sanityOptions);
+  return {
+    title: post.title,
+    description: post.title,
+    openGraph: {
+      title: post.title,
+      description: post.title,
+      url: '',
+      siteName: '',
+      type: 'article',
+      images: [{
+        url: '/api/og?title=' + post.title,
+        width: 800,
+        height: 600,
+      }]
+    },
+  };
+}
 
 const dateOptions = { 
   year: "numeric",
@@ -66,10 +82,7 @@ export default async function Post({params}) {
     const post = await client.fetch(POST_QUERY, await params, sanityOptions);
     const postImageUrl = post.image
       ? urlFor(post.image)?.url()
-      : null;
-
-      console.log(postImageUrl);
-      
+      : null;      
   
     return (
       <main className="container mx-auto min-h-screen max-w-3xl p-8 flex flex-col gap-4">
