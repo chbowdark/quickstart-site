@@ -1,0 +1,40 @@
+name: Update Repository
+run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+on: workflow_dispatch
+permissions: write-all
+jobs:
+  pull-main:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Ensure full history is fetched
+
+      - name: Retrieve User's Git Config
+        run: |
+          USER_NAME=$(git config --get user.name || echo "github-actions[bot]")
+          USER_EMAIL=$(git config --get user.email || echo "github-actions[bot]@users.noreply.github.com")
+
+          echo "USER_NAME=$USER_NAME" >> $GITHUB_ENV
+          echo "USER_EMAIL=$USER_EMAIL" >> $GITHUB_ENV
+
+      - name: Configure Git with Retrieved User
+        run: |
+          git config user.name "$USER_NAME"
+          git config user.email "$USER_EMAIL"
+
+      - name: Add Remote and Fetch Latest Changes
+        run: |
+          git remote add upstream https://github.com/colbyhemond/quickstart-site.git
+          git fetch upstream main
+
+      - name: Merge Remote Changes
+        run: |
+          git checkout main
+          git merge --no-edit upstream/main || echo "No new changes to merge."
+
+      - name: Push Changes
+        run: |
+          git push origin main
